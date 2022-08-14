@@ -6,6 +6,10 @@ namespace RoomBookingApp.Core.Processors
     {
         public RoomBookingResult BookRoom(RoomBookingRequest request)
         {
+            if(request is null)
+            {
+                throw new ArgumentNullException(nameof(request));
+            }
             var result = new RoomBookingResult()
             {
                 FullName = request.FullName,

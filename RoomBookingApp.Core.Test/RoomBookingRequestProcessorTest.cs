@@ -1,10 +1,19 @@
 using RoomBookingApp.Core.Models;
 using RoomBookingApp.Core.Processors;
+using System.Diagnostics;
+using System.Reflection;
 
 namespace RoomBookingApp.Core.Test
 {
     public class RoomBookingRequestProcessorTest
     {
+        private RoomBookingRequestProcessor processor;
+
+        public RoomBookingRequestProcessorTest()
+        {
+            processor = new RoomBookingRequestProcessor();
+        }
+
         [Fact]
         public void ShouldReturnRoomBookingResponseWithValues()
         {
@@ -17,8 +26,6 @@ namespace RoomBookingApp.Core.Test
             };
 
 
-            var processor = new RoomBookingRequestProcessor();
-
             //Act
             RoomBookingResult result = processor.BookRoom(request);
 
@@ -28,6 +35,15 @@ namespace RoomBookingApp.Core.Test
             Assert.Equal(result.FullName, request.FullName);
             Assert.Equal(result.EmailAddress, request.EmailAddress);
             Assert.Equal(result.Date, request.Date);
+        }
+
+        [Fact]
+        public void ShouldThrowExceptionForNullResult()
+        {
+            
+            //Assert
+            var exception = Assert.Throws<ArgumentNullException>(() => processor.BookRoom(null));            
+            Assert.Equal("request", exception.ParamName);
         }
     }
 
