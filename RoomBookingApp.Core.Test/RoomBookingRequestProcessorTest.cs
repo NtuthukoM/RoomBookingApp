@@ -25,7 +25,7 @@ namespace RoomBookingApp.Core.Test
             };
             availableRooms = new List<Room>()
             {
-                new Room()
+                new Room() { Id = 1}
             };
             roomBookingServiceMock = new Mock<IRoomBookingService>();
             roomBookingServiceMock.Setup(a => a.GetAvailableRooms(request.Date))
@@ -72,6 +72,7 @@ namespace RoomBookingApp.Core.Test
             Assert.Equal(booking.FullName, request.FullName);
             Assert.Equal(booking.EmailAddress, request.EmailAddress);
             Assert.Equal(booking.Date, request.Date);
+            Assert.Equal(booking.Id, availableRooms.First().Id);
         }
 
         [Fact]
