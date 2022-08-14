@@ -21,16 +21,18 @@ namespace RoomBookingApp.Core.Processors
             }
 
             var availableRooms = roomBookingService.GetAvailableRooms(request.Date);
-            if(availableRooms.Any())
+            var result = CreateRoomBookingObject<RoomBookingResult>(request);
+            if (availableRooms.Any())
             {
                 var room = availableRooms.First();
                 var roomBooking = CreateRoomBookingObject<RoomBooking>(request);
-                roomBooking.Id = room.Id;
+                
                 roomBookingService.Save(roomBooking);
-            }
+                roomBooking.Id = room.Id;
+                result.Flag = Enums.BookingSuccessFlag.Success;
+            }            
 
 
-            var result = CreateRoomBookingObject<RoomBookingResult>(request);
             return result;
         }
 
