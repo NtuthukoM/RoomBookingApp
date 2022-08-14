@@ -20,7 +20,12 @@ namespace RoomBookingApp.Core.Processors
                 throw new ArgumentNullException(nameof(request));
             }
 
-            roomBookingService.Save(CreateRoomBookingObject<RoomBooking>(request));
+            var availableRooms = roomBookingService.GetAvailableRooms(request.Date);
+            if(availableRooms.Any())
+            {
+                roomBookingService.Save(CreateRoomBookingObject<RoomBooking>(request));
+            }
+
 
             var result = CreateRoomBookingObject<RoomBookingResult>(request);
             return result;
