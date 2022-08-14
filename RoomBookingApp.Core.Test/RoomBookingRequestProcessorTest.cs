@@ -1,3 +1,6 @@
+using Moq;
+using RoomBookingApp.Core.DataServices;
+using RoomBookingApp.Core.Domain;
 using RoomBookingApp.Core.Models;
 using RoomBookingApp.Core.Processors;
 using System.Diagnostics;
@@ -8,24 +11,24 @@ namespace RoomBookingApp.Core.Test
     public class RoomBookingRequestProcessorTest
     {
         private RoomBookingRequestProcessor processor;
+        private RoomBookingRequest request;
+        private Mock<IRoomBookingService> roomBookingServiceMock;
 
         public RoomBookingRequestProcessorTest()
-        {
-            processor = new RoomBookingRequestProcessor();
-        }
-
-        [Fact]
-        public void ShouldReturnRoomBookingResponseWithValues()
-        {
-            //Arrange
-            var request = new RoomBookingRequest()
+        {            
+            request = new RoomBookingRequest()
             {
                 FullName = "Test name",
                 EmailAddress = "test@example.com",
                 Date = new DateTime(2022, 8, 15)
             };
+            roomBookingServiceMock = new Mock<IRoomBookingService>();
+            processor = new RoomBookingRequestProcessor(roomBookingServiceMock.Object);
+        }
 
-
+        [Fact]
+        public void ShouldReturnRoomBookingResponseWithValues()
+        {
             //Act
             RoomBookingResult result = processor.BookRoom(request);
 
@@ -45,6 +48,25 @@ namespace RoomBookingApp.Core.Test
             var exception = Assert.Throws<ArgumentNullException>(() => processor.BookRoom(null));            
             Assert.Equal("request", exception.ParamName);
         }
+
+        [Fact]
+        public void ShouldSaveRoomBookingRequest()
+        {
+            RoomBooking booking = null;
+            roomBookingServiceMock.Setup(q => q.Save(It.IsAny<RoomBooking>()))
+            .Callback<RoomBooking>(x => {
+                booking = x;
+            });
+            
+            processor.BookRoom(request);
+
+            roomBookingServiceMock.Verify(q => q.Save(It.IsAny<RoomBooking>()), Times.Once);
+            Assert.NotNull(booking);
+            Assert.Equal(booking.FullName, request.FullName);
+            Assert.Equal(booking.EmailAddress, request.EmailAddress);
+            Assert.Equal(booking.Date, request.Date);
+        }
+
     }
 
 }
