@@ -98,6 +98,26 @@ namespace RoomBookingApp.Core.Test
             Assert.Equal(result.Flag, flag);
         }
 
+        [Theory]
+        [InlineData(1, true)]
+        [InlineData(null, false)]
+        public void ShouldReturnRoomBookingIdInResult(int? roomBookingId, bool isAvailable)
+        {
+            if (!isAvailable)
+            {
+                availableRooms.Clear();
+            }
+            else
+            {
+                roomBookingServiceMock.Setup(q => q.Save(It.IsAny<RoomBooking>()))
+                .Callback<RoomBooking>(x => {
+                    x.Id = roomBookingId ?? 0;
+                });
+            }
+            var result = processor.BookRoom(request);
+            Assert.Equal(result.RoomBookingId, roomBookingId);
+        }
+
     }
 
 }
